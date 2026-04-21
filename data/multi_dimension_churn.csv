@@ -1,0 +1,11 @@
+Contract,tenure_band,revenue_tier,total_customers,churned,churn_rate_pct
+Month-to-month,"0-12 months","High value",860,595,69.19
+Month-to-month,"13-36 months","High value",753,350,46.48
+Month-to-month,"0-12 months","Mid value",627,282,44.98
+Month-to-month,"37+ months","High value",491,166,33.81
+Month-to-month,"0-12 months","Low value",507,147,28.99
+"One year","0-12 months","High value",15,4,26.67
+Month-to-month,"13-36 months","Mid value",305,67,21.97
+Month-to-month,"37+ months","Mid value",135,24,17.78
+"One year","37+ months","High value",563,98,17.41
+"One year","13-36 months","High value",140,24,17.14

@@ -1,0 +1,6 @@
+tenure_cohort,churn_rate_pct,prev_cohort_churn_rate,churn_rate_change
+"1. 0-12 months",47.44,NULL,NULL
+"2. 13-24 months",28.71,47.44,-18.73
+"3. 25-36 months",21.63,28.71,-7.08
+"4. 37-48 months",19.03,21.63,-2.60
+"5. 49+ months",9.51,19.03,-9.52

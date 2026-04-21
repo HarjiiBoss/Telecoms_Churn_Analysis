@@ -1,0 +1,4 @@
+revenue_tier,total_customers,churned,churn_rate_pct,avg_monthly_charge
+"High value",3591,1274,35.48,90.19
+"Mid value",1721,407,23.65,54.72
+"Low value",1731,188,10.86,22

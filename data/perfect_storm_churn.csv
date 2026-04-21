@@ -1,0 +1,4 @@
+Contract,InternetService,PaymentMethod,tenure_band,total_customers,churned,churn_rate_pct
+Month-to-month,"Fiber optic","Electronic check","0-12 months",631,449,71.16
+Month-to-month,"Fiber optic","Electronic check","13-36 months",429,240,55.94
+Month-to-month,"Fiber optic","Electronic check","37+ months",247,100,40.49

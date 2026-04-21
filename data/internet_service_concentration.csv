@@ -1,0 +1,4 @@
+InternetService,customers,customer_share_pct,monthly_revenue,revenue_share_pct,churned,churn_rate_pct
+"Fiber optic",3096,43.96,283284.4,62.11,1297,41.89
+DSL,2421,34.37,140665.35,30.84,459,18.96
+No,1526,21.67,32166.85,7.05,113,7.40

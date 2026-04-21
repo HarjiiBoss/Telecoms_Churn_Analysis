@@ -1,0 +1,4 @@
+tenure_band,total_customers,churned,churn_rate_pct
+"0-12 months",2186,1037,47.44
+"13-36 months",1856,474,25.54
+"37+ months",3001,358,11.93

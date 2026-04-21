@@ -1,0 +1,7 @@
+Contract,Churn,avg_tenure,avg_monthly,estimated_ltv
+"Two year",Yes,61.3,86.78,5316.9
+"One year",Yes,45.0,85.05,3824.22
+"Two year",No,56.6,60.01,3396.88
+"One year",No,41.7,62.51,2604.97
+Month-to-month,No,21.0,61.46,1292.76
+Month-to-month,Yes,14.0,73.02,1023.51
