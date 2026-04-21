@@ -3,39 +3,40 @@
 **Tool:** MySQL Workbench  
 **Schema:** telco_churn  
 **Table:** customers  
-**Total Queries Written:** 22  
-**SQL Files Created:** 6  
+**Total Queries:** 22  
+**SQL Files:** 6  
 **CSVs Exported:** 17  
 
 ---
 
 ## Objective
 
-Use the full strength of SQL to answer every business question directly in the database across three analytical pillars — Customer, Revenue and Risk. Excel receives clean, analysis-ready summary tables only. The SQL files are a standalone deliverable in this project.
+Use SQL to answer all core business questions across three pillars — Customer, Revenue, and Risk.  
+All computations are performed in MySQL, with Excel receiving only clean, analysis-ready outputs.
 
 ---
 
 ## SQL Concepts Used
 
-| Concept | Where Applied |
-|---|---|
-| `CASE WHEN` | Churn flag conversion, tenure bands, revenue tiers, risk flags |
-| `GROUP BY` + aggregations | Churn rate, revenue totals by segment |
-| `CTE (WITH clause)` | Revenue tiers, multi-dimension breakdown, ranked churn, cohort LAG analysis |
-| `WINDOW FUNCTIONS` | Revenue share %, cumulative revenue, churn rank, percentile rank, cohort comparison |
-| `RANK()` | Contract types ranked by churn rate |
-| `ROW_NUMBER()` | Top 20 highest value churned customers |
-| `SUM() OVER()` | Cumulative revenue by tenure, revenue share of total |
-| `PERCENT_RANK()` | Customer percentile by monthly charge |
-| `LAG()` | Churn rate change between tenure cohorts |
-| `STDDEV()` | Monthly charge standard deviation by churn status |
+| Concept | Application | Specific Usage |
+|---|---|---|
+| CASE WHEN | Segmentation | Tenure bands, revenue tiers, risk flags, churn flag conversion |
+| GROUP BY | Aggregation | Churn rates, revenue totals by segment |
+| CTEs | Multi-step analysis | Revenue tiers, multi-dimension breakdown, cohort LAG analysis |
+| Window Functions | Ranking and cumulative metrics | Revenue share %, cumulative revenue by tenure |
+| RANK() | Contract churn ranking | Ranking contract types by churn rate descending |
+| ROW_NUMBER() | Top customer identification | Top 20 highest value churned customers by TotalCharges |
+| SUM() OVER() | Revenue share and cumulative revenue | Contract revenue share of total, running revenue by tenure |
+| PERCENT_RANK() | Charge distribution | Customer percentile ranking by MonthlyCharges |
+| LAG() | Cohort churn comparison | Churn rate change between consecutive tenure cohorts |
+| STDDEV() | Charge variability | Monthly charge standard deviation by churn status |
 
 ---
 
 ## Phase 1A — Exploration
 
 **File:** `01a_exploration.sql`  
-**Purpose:** Validate data quality and establish baseline metrics before analysis.
+**Purpose:** Validate dataset and establish baseline metrics
 
 ### Results
 
@@ -49,27 +50,30 @@ Use the full strength of SQL to answer every business question directly in the d
 | Overall churn rate | 26.54% |
 
 **Query 2 — Duplicate check:**
-- Result: 0 rows returned — no duplicate CustomerIDs ✅
+
+| Result | Value |
+|---|---|
+| Duplicate CustomerIDs | 0 |
 
 **Query 3 — NULL audit:**
 
-| Column | NULL count |
+| Column | NULL Count |
 |---|---|
 | CustomerID | 0 |
 | tenure | 0 |
 | MonthlyCharges | 0 |
-| TotalCharges | 11 (fixed in Phase 0) |
+| TotalCharges | 11 (resolved in Phase 0) |
 | Churn | 0 |
 | Contract | 0 |
 
-**Data quality verdict:** Clean dataset. Only known nulls are the 11 TotalCharges rows already handled in Phase 0. All key analytical columns are complete.
+**Verdict:** Dataset is clean and analysis-ready.
 
 ---
 
-## Phase 1B — Customer Pillar
+## Phase 1B — Customer Analysis
 
 **File:** `01b_customer.sql`  
-**Purpose:** Identify which customer segments are churning and at what rate.
+**Purpose:** Identify churn patterns across customer segments
 
 ### Results
 
@@ -121,19 +125,19 @@ Use the full strength of SQL to answer every business question directly in the d
 | One year | 11.27% | 2 |
 | Two year | 2.83% | 3 |
 
-### Key Customer Pillar Findings
-- Month-to-month customers churn at **42.71%** — 15x higher than two-year customers
-- Nearly **1 in 2 new customers** (47.44%) leave within their first 12 months
-- Fiber optic churn at **41.89%** signals a service quality or pricing issue
-- Electronic check customers churn at **45.29%** — the highest of any payment method
+### Key Insights
+
+- Churn is heavily concentrated in **early-tenure customers**
+- Contract structure is the strongest predictor of churn
+- Payment method and service type signal behavioural risk patterns
 - Churned customers leave after an average of **18 months** vs 37.6 months for retained
 
 ---
 
-## Phase 1C — Revenue Pillar
+## Phase 1C — Revenue Analysis
 
 **File:** `01c_revenue.sql`  
-**Purpose:** Quantify revenue at risk and identify where revenue is concentrated.
+**Purpose:** Quantify revenue exposure and customer value
 
 ### Results
 
@@ -167,27 +171,33 @@ Use the full strength of SQL to answer every business question directly in the d
 | Tier | Total Customers | Churned | Churn Rate | Avg Monthly |
 |---|---|---|---|---|
 | High value (£70+) | 3,591 | 1,274 | 35.48% | £90.19 |
-| Mid value (£35-£70) | 1,721 | 407 | 23.65% | £54.72 |
+| Mid value (£35–£70) | 1,721 | 407 | 23.65% | £54.72 |
 | Low value (<£35) | 1,731 | 188 | 10.86% | £22.00 |
 
-**Query 5 — Cumulative revenue by tenure:**
-- Tenure 72 generates £29,211.90 in a single month — highest of any cohort
-- Cumulative revenue reaches £456,116.60 at tenure 72
-- Long-tenure customers are the revenue backbone of the business
+**Query 5 — Cumulative revenue by tenure (selected rows):**
 
-### Key Revenue Pillar Findings
-- Churned customers paid **£13.17/month more** than retained customers on average
-- **30.5% of monthly revenue** has already been lost to churn
-- Annualised revenue at risk: **£1,669,570.20**
+| Tenure | Customers | Monthly Revenue | Cumulative Revenue |
+|---|---|---|---|
+| 1 | — | — | — |
+| 12 | — | — | — |
+| 36 | — | — | — |
+| 72 | 362 | £29,211.90 | £456,116.60 |
+
+> Full 72-row output saved in `cumulative_revenue_by_tenure.csv`
+
+### Key Insights
+
+- Revenue loss is driven by **high-value churners**, not low-value users
+- Churned customers paid **£13.17/month more** on average than retained customers
 - Two-year customers generate **2.7x more revenue per customer** than month-to-month
-- High-value customers (£70+/month) churn at the highest rate — **35.48%**
+- Retention of premium customers is critical to business stability
 
 ---
 
-## Phase 1D — Risk Pillar
+## Phase 1D — Risk Analysis
 
 **File:** `01d_risk.sql`  
-**Purpose:** Quantify structural concentration risk across contract types and service categories.
+**Purpose:** Identify structural and concentration risk
 
 ### Results
 
@@ -214,18 +224,19 @@ Use the full strength of SQL to answer every business question directly in the d
 | High risk | 814 | 566 | 69.53% |
 | Standard | 6,229 | 1,303 | 20.92% |
 
-### Key Risk Pillar Findings
-- Month-to-month contracts hold **55.02% of customers** and **56.41% of monthly revenue** — majority of the business sits on the most fragile contract type
-- Fiber optic generates **62.11% of monthly revenue** yet churns at 41.89% — highest revenue concentration in the most volatile service
-- **814 high-risk customers** identified (month-to-month + £70+/month + tenure <12 months)
-- High-risk customers churn at **69.53%** — 3.3x the standard rate of 20.92%
+### Key Insights
+
+- Majority of revenue sits in the **most volatile segments**
+- High-risk customers are clearly identifiable before churn occurs
+- Business model shows **structural fragility** — over half of revenue on month-to-month contracts
+- Fiber optic generates 62.11% of revenue yet carries the highest churn rate
 
 ---
 
-## Phase 1E — Advanced Multi-Dimension Queries
+## Phase 1E — Advanced Analysis
 
 **File:** `01e_advanced.sql`  
-**Purpose:** Combine all three pillars into sophisticated multi-factor analysis using CTEs and window functions.
+**Purpose:** Multi-dimensional segmentation and deeper insight generation
 
 ### Results
 
@@ -256,7 +267,12 @@ Use the full strength of SQL to answer every business question directly in the d
 | Month-to-month | Yes | 14.0 months | £73.02 | £1,023.51 |
 
 **Query 3 — Top churned customer by total charges:**
-- Rank 1: Customer 2889-FPWRM — One year, 72 months, £117.80/month, £8,684.80 total charges
+
+| Rank | CustomerID | Contract | Tenure | Monthly Charges | Total Charges |
+|---|---|---|---|---|---|
+| 1 | 2889-FPWRM | One year | 72 | £117.80 | £8,684.80 |
+
+> Full top 20 list saved in MySQL — not exported to CSV as individual customer rows are not needed for dashboard summaries.
 
 **Query 4 — LAG() cohort churn rate change:**
 
@@ -278,21 +294,29 @@ Use the full strength of SQL to answer every business question directly in the d
 
 *Combination: Month-to-month + Fiber optic + Electronic check*
 
-### Key Advanced Findings
-- Worst single segment: Month-to-month + 0-12 months + High value = **69.19% churn**
-- Perfect storm combination: Month-to-month + Fiber optic + Electronic check + 0-12 months = **71.16% churn**
-- Biggest churn improvement between cohorts: months 12→24 = **-18.73 percentage points**
-- Two-year churned LTV (£5,316.90) is **5.2x higher** than month-to-month churned LTV (£1,023.51)
-- Keeping a customer past 24 months reduces churn risk by more than half
+### Key Insights
+
+- Churn risk is **multi-factor driven**, not single-variable
+- Early retention (<12 months) is the highest leverage intervention point
+- Largest churn improvement occurs between months 12–24: **-18.73 percentage points**
+- Long-term contracts significantly increase customer value — two-year LTV is **5.2x higher** than month-to-month
 
 ---
 
 ## Phase 1F — Exports
 
-**SQL files saved:** 6 files in `/sql` folder  
-**CSVs exported:** 17 files in `/data` folder
+**SQL files saved to `/sql`:**
 
-### CSV Export List
+| File | Contents |
+|---|---|
+| `00_setup.sql` | Schema creation, TotalCharges fix, validation |
+| `01a_exploration.sql` | Baseline metrics and data quality checks |
+| `01b_customer.sql` | Customer pillar — all 6 queries |
+| `01c_revenue.sql` | Revenue pillar — all 5 queries |
+| `01d_risk.sql` | Risk pillar — all 5 queries |
+| `01e_advanced.sql` | Advanced multi-dimension queries — all 5 queries |
+
+**17 CSV outputs exported to `/data`:**
 
 | # | Filename | Source Query |
 |---|---|---|
@@ -301,37 +325,38 @@ Use the full strength of SQL to answer every business question directly in the d
 | 3 | `churn_by_internet_service.csv` | 1B — Query 3 |
 | 4 | `avg_tenure_by_churn.csv` | 1B — Query 4 |
 | 5 | `churn_by_payment_method.csv` | 1B — Query 5 |
-| 6 | `revenue_at_risk.csv` | 1C — Query 2 |
-| 7 | `revenue_by_contract.csv` | 1C — Query 3 |
-| 8 | `revenue_tiers.csv` | 1C — Query 4 |
-| 9 | `cumulative_revenue_by_tenure.csv` | 1C — Query 5 |
-| 10 | `concentration_risk.csv` | 1D — Query 1 |
-| 11 | `internet_service_concentration.csv` | 1D — Query 2 |
-| 12 | `high_risk_customers.csv` | 1D — Query 4 |
-| 13 | `multi_dimension_churn.csv` | 1E — Query 1 |
-| 14 | `estimated_ltv.csv` | 1E — Query 2 |
-| 15 | `cohort_lag_analysis.csv` | 1E — Query 4 |
-| 16 | `avg_charges_by_churn.csv` | 1C — Query 1 |
+| 6 | `avg_charges_by_churn.csv` | 1C — Query 1 |
+| 7 | `revenue_at_risk.csv` | 1C — Query 2 |
+| 8 | `revenue_by_contract.csv` | 1C — Query 3 |
+| 9 | `revenue_tiers.csv` | 1C — Query 4 |
+| 10 | `cumulative_revenue_by_tenure.csv` | 1C — Query 5 |
+| 11 | `concentration_risk.csv` | 1D — Query 1 |
+| 12 | `internet_service_concentration.csv` | 1D — Query 2 |
+| 13 | `high_risk_customers.csv` | 1D — Query 4 |
+| 14 | `multi_dimension_churn.csv` | 1E — Query 1 |
+| 15 | `estimated_ltv.csv` | 1E — Query 2 |
+| 16 | `cohort_lag_analysis.csv` | 1E — Query 4 |
 | 17 | `perfect_storm_churn.csv` | 1E — Query 5 |
 
 ---
 
-## Summary
+## Summary Metrics
 
-| Pillar | Key Metric | Value |
+| Category | Metric | Value |
 |---|---|---|
-| Customer | Overall churn rate | 26.54% |
-| Customer | Month-to-month churn rate | 42.71% |
-| Customer | 0-12 month tenure churn rate | 47.44% |
-| Customer | Fiber optic churn rate | 41.89% |
-| Customer | Electronic check churn rate | 45.29% |
+| Customer | Churn rate | 26.54% |
+| Customer | Month-to-month churn | 42.71% |
+| Customer | Early tenure churn (0-12 months) | 47.44% |
+| Customer | Fiber optic churn | 41.89% |
+| Customer | Electronic check churn | 45.29% |
 | Revenue | Monthly revenue at risk | £139,130.85 |
 | Revenue | Revenue at risk % | 30.50% |
-| Revenue | Annualised revenue at risk | £1,669,570.20 |
-| Revenue | Churned customer avg monthly charge | £74.44 |
+| Revenue | Annualised risk | £1,669,570.20 |
+| Revenue | Churned avg monthly charge | £74.44 |
 | Revenue | High value customer churn rate | 35.48% |
-| Risk | Month-to-month revenue share | 56.41% |
-| Risk | Fiber optic revenue share | 62.11% |
+| Risk | M2M customer share | 55.02% |
+| Risk | M2M revenue share | 56.41% |
+| Risk | Fiber revenue share | 62.11% |
 | Risk | High-risk customers identified | 814 |
 | Risk | High-risk churn rate | 69.53% |
 | Advanced | Worst segment churn rate | 69.19% |
@@ -340,6 +365,5 @@ Use the full strength of SQL to answer every business question directly in the d
 
 ---
 
-*Phase 1 of 10 — Project 4: Telco Customer Churn Analysis*  
-*Framework: Customer · Revenue · Risk*  
-*Tool: MySQL Workbench*
+**Status:** Phase 1 complete — SQL analysis delivers structured insights across customer behaviour, revenue exposure, and structural risk.  
+*Project 4: Telco Customer Churn Analysis — Framework: Customer · Revenue · Risk*
